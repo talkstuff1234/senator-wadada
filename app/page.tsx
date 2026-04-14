@@ -1,21 +1,29 @@
-import Contact from "@/components/pages/home/Contact";
-import Facts from "@/components/pages/home/Facts";
-import Hero from "@/components/pages/home/Hero";
-import Leadership from "@/components/pages/home/Leadership";
-import LegislativeRecord from "@/components/pages/home/LegislativeRecord";
-import Statistics from "@/components/pages/home/Statistics";
-import Vision from "@/components/pages/home/Vision";
+import AcademicBackground from "@/components/AcademicBackground";
+import AnnouncementTicker from "@/components/AnnouncementTicker";
+import CareerOfAction from "@/components/CareerOfAction";
+import ContactSection from "@/components/ContactSection";
+import Facts from "@/components/Facts";
+import HeartsAgenda from "@/components/HeartsAgenda";
+import Hero from "@/components/Hero";
+import InternationalSection from "@/components/InternationalSection";
+import Journey from "@/components/Journey";
+import LegislativeRecord from "@/components/LegislativeRecord";
+import Professionalsjourney from "@/components/Professionalsjourney";
 
 export default function Home() {
   return (
-    <main className="">
+    <>
       <Hero />
-      <Statistics />
+      <AnnouncementTicker />
       <Facts />
+      <Journey />
       <LegislativeRecord />
-      <Vision />
-      <Leadership />
-      <Contact />
-    </main>
+      <CareerOfAction />
+      <HeartsAgenda />
+      <Professionalsjourney />
+      <AcademicBackground />
+      <InternationalSection />
+      <ContactSection />
+    </>
   );
 }

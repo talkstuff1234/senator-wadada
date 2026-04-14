@@ -1,6 +1,7 @@
+import logo from './logo.png';
 import hero from "./hero.jpg";
 import newHero from "./hero.png";
-import altHero from './alt-hero.png';
+import altHero from "./alt-hero.png";
 import honoursHero from "./honours-hero.jpg";
 import imageLeft from "./image-left.jpg";
 import imageRight from "./image-right.jpg";
@@ -90,10 +91,102 @@ import image82 from "./image-83.jpg";
 import image83 from "./image-83.jpg";
 import image84 from "./image-84.jpg";
 import image85 from "./image-85.jpg";
+import image86 from "./image-86.jpg";
+import image87 from "./image-87.png";
+import image88 from "./image-88.png";
+import image89 from "./image-89.png";
+import image90 from "./image-90.jpg";
+import image91 from "./image-91.jpg";
+import image92 from "./image-92.jpg";
+import image93 from "./image-93.jpg";
+import image94 from "./image-94.jpg";
+import image95 from "./image-95.jpg";
+import image96 from "./image-96.jpg";
+import image97 from "./image-97.jpg";
+import image98 from "./image-98.png";
+import image99 from "./image-99.png";
+import image100 from "./image-100.png";
+import image101 from "./image-101.png";
+import image102 from "./image-102.png";
+import image103 from "./image-103.png";
+import image104 from "./image-104.png";
+import image105 from "./image-105.png";
+import image106 from "./image-106.png";
+import image107 from "./image-107.png";
+import image108 from "./image-108.png";
+import image109 from "./image-109.png";
+import image110 from "./image-110.png";
+import image111 from "./image-111.png";
+import image112 from "./image-112.png";
+import image113 from "./image-113.png";
+import image114 from "./image-114.png";
+import image115 from "./image-115.png";
+import image116 from "./image-116.png";
+import image117 from "./image-117.png";
+import image118 from "./image-118.png";
+import image119 from "./image-119.png";
+import image120 from "./image-120.png";
+import image121 from "./image-121.png";
+import image122 from "./image-122.png";
+import image123 from "./image-123.png";
+import image124 from "./image-124.png";
+import image125 from "./image-125.png";
+import image126 from "./image-126.png";
+import image127 from "./image-127.png";
+import image128 from "./image-128.png";
+import image129 from "./image-129.png";
+import image130 from "./image-130.png";
+import image131 from "./image-131.png";
+import image132 from "./image-132.png";
+import image133 from "./image-133.png";
+import image134 from "./image-134.png";
+import image135 from "./image-135.png";
+import image136 from "./image-136.png";
+import image137 from "./image-137.png";
+import image138 from "./image-138.png";
+import image139 from "./image-139.png";
+import image140 from "./image-140.png";
+import image141 from "./image-141.png";
+import image142 from "./image-142.png";
+import image143 from "./image-143.png";
+import image144 from "./image-144.png";
+import image145 from "./image-145.png";
+import image146 from "./image-146.png";
+import image147 from "./image-147.png";
+import image148 from "./image-148.png";
+import image149 from "./image-149.png";
+import image150 from "./image-150.png";
+import image151 from "./image-151.png";
+import image152 from "./image-152.png";
+import image153 from "./image-153.png";
+import image154 from "./image-154.png";
+import image155 from "./image-155.png";
+import image156 from "./image-156.png";
+import image157 from "./image-157.png";
+import image158 from "./image-158.png";
+import image159 from "./image-159.png";
+import image160 from "./image-160.png";
+import image161 from "./image-161.png";
+import image162 from "./image-162.png";
+import image163 from "./image-163.png";
+import image164 from "./image-164.png";
+import image165 from "./image-165.png";
+import image166 from "./image-166.png";
+import image167 from "./image-167.png";
+import image168 from "./image-168.png";
+import image170 from "./image-170.png";
+import image171 from "./image-171.png";
+import image172 from "./image-172.png";
+import image173 from './image-173.png';
 import mail from "./mail-01.svg";
 import phone from "./call-02.svg";
+import crown from "./crown.png";
+import map from "./map.png";
+import people from "./people.png";
+import biggerMap from "./bigger-map.png";
 
 export const assets = {
+  logo,
   mail,
   phone,
   hero,
@@ -103,6 +196,10 @@ export const assets = {
   honoursHero,
   imageRight,
   imageLeft,
+  map,
+  biggerMap,
+  crown,
+  people,
   image1,
   image2,
   image3,
@@ -187,5 +284,92 @@ export const assets = {
   image82,
   image83,
   image84,
-  image85
+  image85,
+  image86,
+  image87,
+  image88,
+  image89,
+  image90,
+  image91,
+  image92,
+  image93,
+  image94,
+  image95,
+  image96,
+  image97,
+  image98,
+  image99,
+  image100,
+  image101,
+  image102,
+  image103,
+  image104,
+  image105,
+  image106,
+  image107,
+  image108,
+  image109,
+  image110,
+  image111,
+  image112,
+  image113,
+  image114,
+  image115,
+  image116,
+  image117,
+  image118,
+  image119,
+  image120,
+  image121,
+  image122,
+  image123,
+  image124,
+  image125,
+  image126,
+  image127,
+  image128,
+  image129,
+  image130,
+  image131,
+  image132,
+  image133,
+  image134,
+  image135,
+  image136,
+  image137,
+  image138,
+  image139,
+  image140,
+  image141,
+  image142,
+  image143,
+  image144,
+  image145,
+  image146,
+  image147,
+  image148,
+  image149,
+  image150,
+  image151,
+  image152,
+  image153,
+  image154,
+  image155,
+  image156,
+  image157,
+  image158,
+  image159,
+  image160,
+  image161,
+  image162,
+  image163,
+  image164,
+  image165,
+  image166,
+  image167,
+  image168,
+  image170,
+  image171,
+  image172,
+  image173
 };

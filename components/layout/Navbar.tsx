@@ -1,251 +1,297 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import { assets } from "@/assets/assets";
+
+type NavTheme = "default" | "projects" | "honours";
+
+const navLinks = [
+  { label: "Home", href: "/#home", section: true },
+  { label: "About", href: "/#about", section: true },
+  { label: "Career", href: "/#career", section: true },
+  { label: "Legislature", href: "/#legislature", section: true },
+  { label: "Honours", href: "/honours", section: false },
+  { label: "Projects", href: "/projects", section: false },
+];
+
+const themeConfig: Record<NavTheme, { bg: string; linkColor: string; activeColor: string; logoFilter: string }> = {
+  default: {
+    bg: "bg-white/95 backdrop-blur-md shadow-sm",
+    linkColor: "text-gray-700 hover:text-[#1a5c38]",
+    activeColor: "text-[#1a5c38]",
+    logoFilter: "",
+  },
+  projects: {
+    bg: "bg-black/95 backdrop-blur-md",
+    linkColor: "text-white/70 hover:text-white",
+    activeColor: "text-white",
+    logoFilter: "brightness-0 invert",
+  },
+  honours: {
+    bg: "bg-transparent",
+    linkColor: "text-white/80 hover:text-white",
+    activeColor: "text-white",
+    logoFilter: "brightness-0 invert",
+  },
+};
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showNav, setShowNav] = useState(true);
+  const [activeSection, setActiveSection] = useState("home");
+  const hideTimer = useRef<NodeJS.Timeout | null>(null);
 
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // ── Theme ──────────────────────────────────────────────────────────────────
+  const theme: NavTheme = pathname === "/projects" ? "projects" : pathname === "/honours" ? "honours" : "default";
 
-  const isMediaPage = pathname === "/media";
-  const isHonoursPage = pathname === "/honours";
-  const isDarkPage = isMediaPage || isHonoursPage;
+  const t = themeConfig[theme];
+    const isOnHomePage = pathname === "/";
+    const prevPathname = useRef(pathname);
 
-  // ✅ Calculate hash during rendering, not in an Effect
-  const hash = typeof window !== "undefined" ? window.location.hash : "";
+  // ── Close mobile menu on route change ────────────────────────────────────────
+useEffect(() => {
+  if (prevPathname.current !== pathname && menuOpen) {
+    setMenuOpen(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    prevPathname.current = pathname;
+  }
+}, [pathname, menuOpen]);
+  // ── Body lock when drawer open ─────────────────────────────────────────────
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
 
-  const navLinks = [
-    { name: "Home", href: "/", section: "hero" },
-    { name: "About", href: "/", section: "about" },
-    { name: "Career", href: "/", section: "career" },
-    { name: "Legislature", href: "/", section: "legislature" },
-    { name: "Honours", href: "/honours", isPage: true },
-    { name: "Media", href: "/media", isPage: true },
-  ];
-
-  const isActive = (href: string) => pathname === href;
-
-  const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, item: (typeof navLinks)[0]) => {
-    if (item.isPage) {
-      return;
-    }
-
-    e.preventDefault();
-
-    if (pathname !== "/") {
-      router.push(`/${item.section ? `#${item.section}` : ""}`);
-    } else {
-      const element = document.getElementById(item.section || "");
-      if (element) {
-        const offset = 100;
-        const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - offset;
-
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: "smooth",
-        });
-      }
-    }
-
-    setMobileMenuOpen(false);
-  };
-
-  const handleJoinClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-
-    if (pathname !== "/") {
-      router.push("/#join");
-    } else {
-      const element = document.getElementById("join");
-      if (element) {
-        const offset = 100;
-        const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - offset;
-
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: "smooth",
-        });
-      }
-    }
-
-    setMobileMenuOpen(false);
-  };
-
-  /* Scroll effect */
+  // ── Hide nav on idle scroll ────────────────────────────────────────────────
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      const current = window.scrollY;
+      setScrolled(current > 10);
+      setShowNav(true);
+      if (hideTimer.current) clearTimeout(hideTimer.current);
+      hideTimer.current = setTimeout(() => {
+        if (window.scrollY > window.innerHeight * 0.5) setShowNav(false);
+      }, 1500);
     };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-    if (typeof window !== "undefined") {
-      window.addEventListener("scroll", handleScroll);
-      return () => window.removeEventListener("scroll", handleScroll);
-    }
-  }, []); // ✅ Empty dependency array - only runs once on mount
-
-  /* Lock scroll when mobile menu open */
+  // ── Track active section via IntersectionObserver (home page only) ─────────
   useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.body.style.overflow = mobileMenuOpen ? "hidden" : "auto";
+    if (!isOnHomePage) return;
+    const sectionIds = ["home", "about", "career", "legislature"];
+    const observers: IntersectionObserver[] = [];
+
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) setActiveSection(id);
+        },
+        { rootMargin: "-50% 0px -50% 0px", threshold: 0 },
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
+  }, [isOnHomePage]);
+
+  // ── Smooth-scroll to section (handles cross-page navigation too) ───────────
+  const handleSectionClick = (e: React.MouseEvent<HTMLAnchorElement>, link: (typeof navLinks)[number]) => {
+    if (!link.section) return; // let Next.js handle page links normally
+
+    e.preventDefault();
+    setMenuOpen(false);
+    const sectionId = link.href.replace("/#", "");
+
+    if (isOnHomePage) {
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      // Navigate to home, then scroll after mount
+      router.push(`/#${sectionId}`);
     }
-  }, [mobileMenuOpen]); // ✅ Depends on mobileMenuOpen, runs when it changes
-
-  /* Handle hash scrolling when coming from another page */
-  useEffect(() => {
-    if (pathname === "/" && hash) {
-      const sectionId = hash.replace("#", "");
-      // Use setTimeout to ensure DOM is ready
-      const timeoutId = setTimeout(() => {
-        const element = document.getElementById(sectionId);
-        if (element) {
-          const offset = 100;
-          const elementPosition = element.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - offset;
-
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: "smooth",
-          });
-        }
-      }, 100);
-
-      return () => clearTimeout(timeoutId); // Clean up timeout
-    }
-  }, [pathname, hash]); // ✅ Depends on pathname and hash
-
-  // Get link text color based on page
-  const getLinkTextColor = (isPageLink: boolean = false) => {
-    if (isDarkPage) {
-      return isPageLink ? "text-black/70 hover:bg-black/10 hover:text-black" : "text-black/70 hover:bg-black/10 hover:text-black";
-    }
-    return "text-white/80 hover:bg-white/10 hover:text-white";
   };
 
-  const getActiveLinkClass = () => {
-    return "bg-white text-black shadow";
+  // ── Is a link "active"? ────────────────────────────────────────────────────
+  const isActive = (link: (typeof navLinks)[number]) => {
+    if (!link.section) return pathname === link.href;
+    if (!isOnHomePage) return false;
+    return activeSection === link.href.replace("/#", "");
   };
+
+  // ── Nav background ─────────────────────────────────────────────────────────
+  const navBg = theme === "honours" ? (scrolled ? "bg-black/60 backdrop-blur-md" : "bg-transparent") : t.bg;
 
   return (
     <>
-      {/* NAVBAR */}
-      <nav
-        className={`fixed top-0 w-full z-[1000] transition-all duration-300 px-6 py-4
-        ${isDarkPage ? "bg-white shadow" : isScrolled ? "bg-black/30 backdrop-blur-xl shadow-lg" : "bg-transparent"}`}
+      <motion.nav
+        initial={{ y: -80, opacity: 0 }}
+        animate={{ y: showNav ? 0 : -80, opacity: showNav ? 1 : 0 }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
+        className={`fixed top-0 left-0 right-0 z-200 transition-all duration-500
+          ${navBg} ${scrolled ? "py-3" : "py-4"}`}
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* LOGO */}
-          <Link href="/">
-            <h1
-              className={`anton tracking-wider text-lg transition-colors duration-300
-                ${isDarkPage ? "text-black" : "text-white"}`}
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3 flex-shrink-0">
+            <Image src={assets.logo} alt="logo" width={40} />
+            <span
+              className={` font-anton tracking-wider text-sm leading-tight hidden sm:block
+                ${theme !== "default" ? "text-white" : "text-gray-900"}`}
             >
               Sen. Ahmed Wadada Aliyu
-            </h1>
+            </span>
           </Link>
 
-          {/* DESKTOP NAV */}
-          <ul className="hidden md:flex items-center gap-2 px-3 py-2 rounded-full">
-            {navLinks.map((item) => (
-              <li key={item.name}>
-                {item.isPage ? (
-                  <Link
-                    href={item.href}
-                    className={`px-4 py-2 text-sm rounded-full transition-all
-                      ${isActive(item.href) ? getActiveLinkClass() : getLinkTextColor(true)}`}
-                  >
-                    {item.name}
-                  </Link>
-                ) : (
-                  <a
-                    href={`/#${item.section}`}
-                    onClick={(e) => handleNavigation(e, item)}
-                    className={`px-4 py-2 text-sm rounded-full transition-all cursor-pointer
-                      ${pathname === "/" && hash === `#${item.section}` ? getActiveLinkClass() : getLinkTextColor()}`}
-                  >
-                    {item.name}
-                  </a>
-                )}
-              </li>
-            ))}
-          </ul>
+          {/* Desktop Links */}
+          <div className="hidden md:flex items-center gap-7">
+            {navLinks.map((link) => {
+              const active = isActive(link);
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  onClick={(e) => handleSectionClick(e, link)}
+                  className={`text-sm font-medium transition-colors duration-200 relative group
+                    ${active ? t.activeColor + " font-semibold" : t.linkColor}`}
+                >
+                  {link.label}
+                  {/* Underline indicator */}
+                  <span
+                    className={`absolute -bottom-0.5 left-0 h-[2px] bg-[#1a5c38] rounded transition-all duration-300
+                      ${theme !== "default" ? "bg-white" : "bg-[#1a5c38]"}
+                      ${active ? "w-full" : "w-0 group-hover:w-full"}`}
+                  />
+                </Link>
+              );
+            })}
+          </div>
 
-          {/* CTA BUTTON */}
-          <Link
-            href="/#join"
-            onClick={handleJoinClick}
-            className="hidden md:flex bg-[#375DFB] hover:bg-blue-700 text-white px-5 py-2 rounded-full text-sm transition cursor-pointer"
-          >
-            Join the Movement
-          </Link>
+          {/* CTA */}
+          <div className="hidden md:block">
+            <Link
+              href="/#contact"
+              onClick={(e) => handleSectionClick(e, { label: "Contact", href: "/#contact", section: true })}
+              className={`text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200
+                ${
+                  theme === "default"
+                    ? "bg-[#1a5c38] text-white hover:bg-[#14472c]"
+                    : "bg-white/15 text-white border border-white/30 hover:bg-white/25"
+                }`}
+            >
+              Join the Movement
+            </Link>
+          </div>
 
-          {/* MOBILE MENU BUTTON */}
+          {/* Mobile Hamburger */}
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`md:hidden p-3 rounded-full transition-colors
-              ${isDarkPage ? "bg-[#375DFB]" : "bg-gray-500"}`}
+            onClick={() => setMenuOpen(true)}
+            className={`md:hidden flex flex-col gap-[5px] p-1
+              ${theme !== "default" ? "text-white" : "text-gray-900"}`}
+            aria-label="Open menu"
           >
-            <div className="w-5 h-5 flex flex-col justify-center items-center">
-              <span className={`block w-5 h-0.5 bg-white transition ${mobileMenuOpen ? "rotate-45 translate-y" : "-translate-y-1"}`} />
-              <span className={`block w-5 h-0.5 bg-white transition ${mobileMenuOpen ? "opacity-0" : "opacity-100"}`} />
-              <span className={`block w-5 h-0.5 bg-white transition ${mobileMenuOpen ? "-rotate-45 -translate-y-1" : "translate-y-1"}`} />
-            </div>
+            <span className="block w-6 h-[2px] bg-current rounded" />
+            <span className="block w-6 h-[2px] bg-current rounded" />
+            <span className="block w-4 h-[2px] bg-current rounded self-end" />
           </button>
         </div>
-      </nav>
+      </motion.nav>
 
-      {/* OVERLAY */}
-      <div
-        onClick={() => setMobileMenuOpen(false)}
-        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden transition
-        ${mobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
-      />
+      {/* ── Mobile Drawer ── */}
+      <AnimatePresence>
+        {menuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm md:hidden"
+              onClick={() => setMenuOpen(false)}
+            />
 
-      {/* MOBILE MENU */}
-      <div
-        className={`fixed right-0 top-0 h-full w-full sm:w-96 bg-[#031B2B] backdrop-blur-2xl border-l border-white/20 z-50 transition-transform duration-300 md:hidden
-        ${mobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}
-      >
-        <div className="flex flex-col pt-24 px-6 gap-2">
-          {navLinks.map((item) => (
-            <React.Fragment key={item.name}>
-              {item.isPage ? (
+            {/* Drawer panel */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 260 }}
+              className="fixed top-0 right-0 z-[70] h-full w-[78%] max-w-sm bg-white flex flex-col md:hidden"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+                <span className="font-semibold text-sm text-gray-900">Sen. Ahmed Wadada Aliyu</span>
+                <button onClick={() => setMenuOpen(false)} className="text-gray-500 hover:text-gray-900 transition p-1" aria-label="Close menu">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Links */}
+              <nav className="flex flex-col px-6 pt-4 gap-1 flex-1 overflow-y-auto">
+                {navLinks.map((link, i) => {
+                  const active = isActive(link);
+                  return (
+                    <motion.div key={link.label} initial={{ x: 30, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: i * 0.06 }}>
+                      <Link
+                        href={link.href}
+                        onClick={(e) => handleSectionClick(e, link)}
+                        className={`flex items-center justify-between py-3.5 text-base font-medium border-b border-gray-100 transition-colors
+                          ${active ? "text-[#1a5c38]" : "text-gray-700 hover:text-[#1a5c38]"}`}
+                      >
+                        {link.label}
+                        {/* Page links get a small arrow; section links get none */}
+                        {!link.section && (
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M7 17L17 7M7 7h10v10" />
+                          </svg>
+                        )}
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </nav>
+
+              {/* Mobile CTA */}
+              <div className="px-6 pb-10 pt-4">
                 <Link
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`text-lg px-5 py-4 rounded-2xl transition text-white hover:bg-white/10
-                  ${isActive(item.href) ? "bg-white/20 text-white" : ""}`}
+                  href="/#contact"
+                  onClick={(e) => {
+                    handleSectionClick(e, { label: "Contact", href: "/#contact", section: true });
+                    setMenuOpen(false);
+                  }}
+                  className="block text-center bg-[#1a5c38] text-white px-6 py-3.5 rounded-full font-semibold hover:bg-[#14472c] transition"
                 >
-                  {item.name}
+                  Join the Movement
                 </Link>
-              ) : (
-                <a
-                  href={`/#${item.section}`}
-                  onClick={(e) => handleNavigation(e, item)}
-                  className={`text-lg px-5 py-4 rounded-2xl transition cursor-pointer text-white hover:bg-white/10
-                  ${pathname === "/" && hash === `#${item.section}` ? "bg-white/20 text-white" : ""}`}
-                >
-                  {item.name}
-                </a>
-              )}
-            </React.Fragment>
-          ))}
-
-          {/* Mobile Join Button */}
-          <Link
-            href="/#join"
-            onClick={handleJoinClick}
-            className="mt-6 bg-[#375DFB] text-white py-4 rounded-2xl text-center hover:bg-blue-700 transition"
-          >
-            Join the Movement
-          </Link>
-        </div>
-      </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }

@@ -1,7 +1,8 @@
-import { Anton, Architects_Daughter } from "next/font/google";
-import Navbar from "@/components/layout/Navbar";
+import { Anton, Architects_Daughter, Fraunces, Instrument_Serif, Inter } from "next/font/google";
+
 import "./globals.css";
 import Footer from "@/components/layout/Footer";
+import Navbar from "@/components/layout/Navbar";
 
 export const metadata = {
   title: "Sen. Ahmed Wadada Aliyu",
@@ -47,10 +48,28 @@ const anton = Anton({
   variable: "--font-anton",
 });
 
+const inter = Inter({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-inter",
+});
+
 const architectsDaughter = Architects_Daughter({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-architects-daughter",
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-instrument-serif",
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-fraunces",
 });
 
 export default function RootLayout({
@@ -60,7 +79,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${anton.variable} ${architectsDaughter.variable}`}>
+      <body className={`${anton.variable} ${architectsDaughter.variable} ${fraunces.variable} ${instrumentSerif.variable} ${inter.variable}`}>
         <Navbar />
         {children}
         <Footer />

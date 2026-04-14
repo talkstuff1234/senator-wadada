@@ -4,7 +4,7 @@ import React, { useRef } from "react";
 import Image from "next/image";
 import { motion, useInView, Variants } from "framer-motion";
 import { assets } from "@/assets/assets";
-import CareerTable from "@/components/pages/home/CareerTable";
+import CareerTable from "@/components/CareerTable";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -297,37 +297,44 @@ function Statistics() {
   const bannerInView = useInView(bannerRef, { once: true, margin: "-60px" });
 
   return (
-    <section className="w-full">
-      {/* Banner */}
-      <div ref={bannerRef} className="w-full h-screen relative">
+    <section className="w-full bg-white">
+      {/* Banner - responsive height */}
+      <div ref={bannerRef} className="w-full h-[60vh] sm:h-[70vh] md:h-[80vh] relative mb-8 sm:mb-12">
         <motion.div
           className="absolute inset-0"
           initial={{ scale: 1.05 }}
           animate={bannerInView ? { scale: 1 } : { scale: 1.05 }}
           transition={{ duration: 1.4, ease: EASE }}
         >
-          <Image src={assets.honoursHero} alt="Ahmed Wadada Aliyu" fill priority className="object-cover [object-position:0_-320px]" />
+          <Image
+            src={assets.image173}
+            alt="Ahmed Wadada Aliyu"
+            fill
+            priority
+            className="object-cover object-center sm:object-[center_20%] md:object-[center_30%]"
+            sizes="100vw"
+          />
         </motion.div>
 
         <motion.div
-          className="absolute top-0 left-0 w-full h-60 bg-gradient-to-b from-black/100 to-transparent z-10"
+          className="absolute top-0 left-0 w-full h-40 sm:h-60 bg-gradient-to-b from-black/100 to-transparent z-10"
           variants={fadeIn}
           initial="hidden"
           animate={bannerInView ? "visible" : "hidden"}
           custom={0.2}
         />
         <motion.div
-          className="absolute bottom-0 left-0 w-full h-56 bg-gradient-to-t from-black/100 to-transparent z-10"
+          className="absolute bottom-0 left-0 w-full h-40 sm:h-56 bg-gradient-to-t from-black/100 to-transparent z-10"
           variants={fadeIn}
           initial="hidden"
           animate={bannerInView ? "visible" : "hidden"}
           custom={0.2}
         />
 
-        <div className="w-full h-full relative z-50 text-white flex justify-center items-end pb-10 sm:pb-12 px-4">
+        <div className="w-full h-full relative z-50 text-white flex justify-center items-end pb-8 sm:pb-10 md:pb-12 px-4">
           <div className="text-center">
             <motion.p
-              className="bg-black/10 backdrop-blur-xl rounded-xl p-2 inline-block text-xs sm:text-sm mb-3"
+              className="bg-black/10 backdrop-blur-xl rounded-xl p-2 inline-block  mb-3"
               variants={fadeUp}
               initial="hidden"
               animate={bannerInView ? "visible" : "hidden"}
@@ -336,7 +343,7 @@ function Statistics() {
               Honours & Recognition
             </motion.p>
             <motion.h1
-              className="text-2xl sm:text-3xl mb-4 sm:mb-6 leading-snug max-w-xs sm:max-w-lg mx-auto"
+              className="text-xl sm:text-2xl md:text-3xl mb-3 sm:mb-4 md:mb-6 leading-snug max-w-xs sm:max-w-lg mx-auto px-2"
               variants={fadeUp}
               initial="hidden"
               animate={bannerInView ? "visible" : "hidden"}
@@ -344,18 +351,19 @@ function Statistics() {
             >
               A Career Decorated With Excellence
             </motion.h1>
-            <motion.span className="text-xs" variants={fadeUp} initial="hidden" animate={bannerInView ? "visible" : "hidden"} custom={0.6}>
+            <motion.span className="" variants={fadeUp} initial="hidden" animate={bannerInView ? "visible" : "hidden"} custom={0.6}>
               Senator · Entrepreneur · Community Leader
             </motion.span>
           </div>
         </div>
       </div>
-      <div className="p-4">
-        <h1 className="font-architects-daughter text-[#6A6A6A] text-3xl lg:text-4xl text-center">Awards</h1>
+
+      {/* Awards section with top padding */}
+      <div className="p-4 pt-6 sm:pt-8">
+        <h1 className="font-architects-daughter text-[#6A6A6A] text-2xl sm:text-3xl lg:text-4xl text-center">Awards</h1>
         <CareerTable headers={AWARDS_HEADERS} rows={AWARDS_ROWS} />
       </div>
     </section>
   );
 }
-
 export default Statistics;

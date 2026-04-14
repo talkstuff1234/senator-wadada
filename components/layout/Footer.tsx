@@ -68,13 +68,11 @@ export default function Footer() {
 
   return (
     <footer className="w-full px-3 py-8">
-      <div className="border border-gray-200 rounded-xl px-6 py-5 flex flex-col gap-3 bg-white">
+      <div className=" rounded-xl px-6 py-5 flex flex-col gap-3">
         {/* Top row */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <Link href="/">
-            <span
-              className="font-bold text-[#212121] text-base cursor-pointer font-anton hover:text-[#375DFB] transition-colors duration-150"
-            >
+            <span className=" text-white text-base cursor-pointer font-anton transition-colors duration-150">
               Sen. Ahmed Wadada Aliyu
             </span>
           </Link>
@@ -86,7 +84,7 @@ export default function Footer() {
                   <Link
                     href={link.href}
                     className={`text-sm transition-colors duration-150 ${
-                      isActive(link.href) ? "text-[#375DFB] font-medium" : "text-gray-600 hover:text-black"
+                      isActive(link.href) ? "text-primary font-medium" : "text-white hover:text-primary"
                     }`}
                   >
                     {link.name}
@@ -96,7 +94,7 @@ export default function Footer() {
                     href={`/#${link.section}`}
                     onClick={(e) => handleNavigation(e, link)}
                     className={`text-sm transition-colors duration-150 cursor-pointer ${
-                      pathname === "/" && hash === `#${link.section}` ? "text-[#375DFB] font-medium" : "text-gray-600 hover:text-black"
+                      pathname === "/" && hash === `#${link.section}` ? "text-primary font-medium" : "text-white"
                     }`}
                   >
                     {link.name}
@@ -108,22 +106,25 @@ export default function Footer() {
             <Link
               href="/#join"
               onClick={handleJoinClick}
-              className="text-sm transition-colors duration-150 cursor-pointer text-gray-600 hover:text-[#375DFB]"
+              className="text-sm transition-colors duration-150 cursor-pointer text-white"
             >
               Join
             </Link>
           </nav>
         </div>
 
-        {/* Divider */}
-        <div className="border-t border-gray-100 my-2" />
 
         {/* Bottom row */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs text-gray-400">
           <p>© 2025 Senator Ahmed Wadada Aliyu. All Rights Reserved.</p>
           <p>
             Designed by{" "}
-            <a href="https://talkstuff.social" target="_blank" rel="noopener noreferrer" className="hover:text-[#375DFB] transition-colors duration-150">
+            <a
+              href="https://talkstuff.social"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#375DFB] transition-colors duration-150"
+            >
               Talkstuff
             </a>
           </p>
